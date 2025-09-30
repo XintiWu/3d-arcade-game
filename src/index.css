@@ -1,0 +1,523 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.arcade-container {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* 遊戲UI樣式 */
+.game-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.game-ui > * {
+  pointer-events: auto;
+}
+
+.game-info {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #3b82f6;
+  backdrop-filter: blur(10px);
+  min-width: 280px;
+}
+
+.game-info h2 {
+  margin: 0 0 15px 0;
+  color: #3b82f6;
+  font-size: 20px;
+  text-align: center;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.stat .label {
+  font-weight: bold;
+  color: #94a3b8;
+}
+
+.stat .value {
+  font-weight: bold;
+  color: #3b82f6;
+  font-size: 16px;
+}
+
+.game-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #4ECDC4;
+  backdrop-filter: blur(10px);
+  min-width: 300px;
+}
+
+.game-controls h3 {
+  margin: 0 0 15px 0;
+  color: #4ECDC4;
+  font-size: 18px;
+  text-align: center;
+}
+
+.control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-mode-btn, .reset-btn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(78, 205, 196, 0.2);
+  color: #4ECDC4;
+  border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+.game-mode-btn:hover, .reset-btn:hover {
+  background: rgba(78, 205, 196, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+}
+
+.game-mode-btn.active {
+  background: rgba(78, 205, 196, 0.4);
+  color: #fff;
+  border-color: #4ECDC4;
+}
+
+.camera-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #ffd700;
+  backdrop-filter: blur(10px);
+  min-width: 250px;
+}
+
+.camera-controls h3 {
+  margin: 0 0 15px 0;
+  color: #ffd700;
+  font-size: 18px;
+  text-align: center;
+}
+
+.camera-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.camera-btn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.camera-btn:hover {
+  background: rgba(255, 215, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.controls-help {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #ef4444;
+  backdrop-filter: blur(10px);
+  max-width: 300px;
+}
+
+.controls-help h3 {
+  margin: 0 0 15px 0;
+  color: #ef4444;
+  font-size: 18px;
+  text-align: center;
+}
+
+.help-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+.help-content strong {
+  color: #ef4444;
+}
+
+.game-completed {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  border: 3px solid #10b981;
+  backdrop-filter: blur(15px);
+  text-align: center;
+  min-width: 400px;
+}
+
+.game-completed h2 {
+  margin: 0 0 20px 0;
+  color: #10b981;
+  font-size: 28px;
+}
+
+.game-completed p {
+  margin: 10px 0;
+  font-size: 18px;
+  color: #e2e8f0;
+}
+
+.restart-btn {
+  margin-top: 20px;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  border: 2px solid #10b981;
+}
+
+.restart-btn:hover {
+  background: rgba(16, 185, 129, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* React 小島樣式 */
+.react-island {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #10b981;
+  border-radius: 15px;
+  padding: 20px;
+  z-index: 1002;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+}
+
+.react-island-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.react-island-header h3 {
+  margin: 0;
+  color: #10b981;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.react-minimize-btn {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.react-minimize-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(1.1);
+}
+
+.react-canvas-container {
+  width: 100%;
+  height: 200px;
+  border: 2px solid #10b981;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.react-game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.react-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.react-btn {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  text-align: center;
+}
+
+.react-btn:hover {
+  background: rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.react-btn.active {
+  background: rgba(16, 185, 129, 0.4);
+  color: #fff;
+  border-color: #10b981;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+}
+
+.react-game-stats {
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+  font-size: 12px;
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.react-island-minimized {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1002;
+}
+
+.react-toggle-btn {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 2px solid #10b981;
+  border-radius: 25px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.react-toggle-btn:hover {
+  background: rgba(16, 185, 129, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.react-island-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1003;
+}
+
+.toggle-react-btn {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.toggle-react-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* 遊戲選擇面板樣式 */
+.game-selector {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.95);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #8b5cf6;
+  backdrop-filter: blur(15px);
+  min-width: 280px;
+  z-index: 1001;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+}
+
+.game-selector-header {
+  margin-bottom: 15px;
+}
+
+.game-selector-header h3 {
+  margin: 0;
+  color: #8b5cf6;
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.game-selector-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-selector-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  text-align: left;
+}
+
+.game-selector-btn:hover {
+  background: rgba(139, 92, 246, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+  color: #c4b5fd;
+}
+
+.game-selector-btn.active {
+  background: rgba(139, 92, 246, 0.4);
+  color: #fff;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.game-emoji {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.game-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}

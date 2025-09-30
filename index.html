@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D街機遊戲 - React TypeScript 版本</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+        
+        #arcade-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .test-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #3b82f6;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .test-info h2 {
+            margin: 0 0 10px 0;
+            color: #3b82f6;
+            font-size: 18px;
+        }
+        
+        .test-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #4ECDC4;
+            z-index: 1000;
+        }
+        
+        .controls h3 {
+            margin: 0 0 10px 0;
+            color: #4ECDC4;
+            font-size: 16px;
+        }
+        
+        .controls p {
+            margin: 3px 0;
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .level-indicator h3 {
+            margin: 0 0 10px 0;
+            color: #ffd700;
+            font-size: 16px;
+        }
+        
+        .level-indicator .level-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .level-indicator .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .level-indicator .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #3b82f6);
+            transition: width 0.3s ease;
+        }
+
+        /* React 小島樣式 */
+        .react-island {
+            position: absolute;
+            top: 20px;
+            right: 300px;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+        }
+
+        .react-island h3 {
+            margin: 0 0 15px 0;
+            color: #10b981;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .react-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .react-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .react-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .react-btn.active {
+            background: rgba(16, 185, 129, 0.4);
+            color: #fff;
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <!-- React 應用掛載點 (完全隱藏) -->
+    <div id="root"></div>
+    
+    <!-- 原本的遊戲容器 -->
+    <div id="arcade-container"></div>
+    
+    <!-- 原本的HTML內容 -->
+    <div id="fallback-content">
+        <div class="test-info">
+            <h2>🎮 3D街機遊戲</h2>
+            <p><strong>遊戲說明：</strong></p>
+            <p>• 按著左鍵可旋轉遊戲機</p>
+            <p>• 點擊遊戲機進入遊戲</p>
+            <p>• 貪食蛇：吃蘋果讓蛇變長<br>&nbsp;&nbsp;不要咬到自己和撞到邊界</p>
+            <p>• 吃豆人：吃完CHLOE豆子</p>
+            <p>• 太空侵略者：空白鍵發射子彈<br>&nbsp;&nbsp;消滅XINTI侵略者</p>
+        </div>
+        
+        <div class="level-indicator">
+            <h3>🎮 遊戲模式</h3>
+            <div class="level-number" id="level-display">吃豆人</div>
+            <div id="progress-text">目標: 完成一次遊戲</div>
+        </div>
+        
+        <div class="controls">
+            <h3>🎯 遊戲控制</h3>
+            <p><strong>移動：</strong> A/D 或 ←/→</p>
+            <p><strong>射擊：</strong> 空白鍵</p>
+            <p><strong>切換遊戲：</strong> G 鍵</p>
+            <p><strong>視角切換：</strong> 點擊螢幕</p>
+            <p><strong>退出遊戲：</strong> ESC 鍵</p>
+        </div>
+    </div>
+    
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="./GLTFLoader.js"></script>
+    
+    <script>
+        // 調試 Three.js 載入
+        window.addEventListener('load', function() {
+            console.log('🔍 Three.js 版本:', THREE.REVISION);
+            console.log('🔍 GLTFLoader 可用:', typeof THREE.GLTFLoader !== 'undefined');
+            
+            if (typeof THREE.GLTFLoader === 'undefined') {
+                console.error('❌ GLTFLoader 未載入，將使用備用模型');
+            } else {
+                console.log('✅ GLTFLoader 已正確載入');
+            }
+        });
+    </script>
+    
+    <!-- React 應用腳本 -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- 原本的遊戲主程式 (備用，如果React應用載入失敗) -->
+    <script src="arcade3d.js"></script>
+    
+    <!-- React 小島程式將由 React 應用提供 -->
+    
+    <script>
+        // 備用的原本遊戲初始化 (如果React應用載入失敗)
+        let arcadeMachine;
+        
+        // 等待頁面載入完成
+        window.addEventListener('load', () => {
+            console.log('🎮 啟動原本的JavaScript遊戲...');
+            
+            // 總是顯示原本的遊戲內容
+            const fallbackContent = document.getElementById('fallback-content');
+            if (fallbackContent) {
+                fallbackContent.style.display = 'block';
+            }
+            
+            // 創建街機遊戲機實例
+            arcadeMachine = new ArcadeMachine3D();
+            
+            // 將實例保存到全域變數
+            window.arcadeMachine = arcadeMachine;
+            
+            // 監聽關卡變化事件
+            document.addEventListener('levelChanged', (event) => {
+                updateLevelDisplay(event.detail);
+            });
+            
+            // 監聽進度變化事件
+            document.addEventListener('progressChanged', (event) => {
+                updateProgressDisplay(event.detail);
+            });
+            
+            console.log('✅ 原本的JavaScript遊戲系統初始化完成！');
+            
+            // 檢查React應用狀態
+            setTimeout(() => {
+                if (window.ReactAppLoaded) {
+                    console.log('✅ React TypeScript 應用正在背景運行');
+                } else {
+                    console.log('⚠️ React應用未載入，但原本遊戲正常運行');
+                }
+            }, 1000);
+        });
+        
+        function updateLevelDisplay(gameModeData) {
+            const levelDisplay = document.getElementById('level-display');
+            const progressText = document.getElementById('progress-text');
+            
+            let modeText = '';
+            switch(gameModeData.gameMode) {
+                case 'pacman':
+                    modeText = '👻 吃豆人';
+                    break;
+                case 'space_invaders':
+                    modeText = '👽 太空侵略者';
+                    break;
+                case 'snake':
+                    modeText = '🐍 貪食蛇';
+                    break;
+            }
+            
+            levelDisplay.textContent = modeText;
+            progressText.textContent = '目標: 完成一次遊戲';
+            progressText.style.color = '#fff';
+        }
+        
+        // 定期更新顯示
+        setInterval(() => {
+            if (arcadeMachine && arcadeMachine.gameState) {
+                const gameState = arcadeMachine.gameState;
+                
+                updateLevelDisplay({
+                    gameMode: gameState.gameMode
+                });
+            }
+        }, 100);
+        
+    </script>
+</body>
+</html>
